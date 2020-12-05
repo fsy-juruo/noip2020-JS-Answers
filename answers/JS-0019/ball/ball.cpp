@@ -1,0 +1,235 @@
+#include<iostream>
+#include<cstdio>
+#include<iomanip>
+#include<cmath>
+#include<algorithm>
+#include<cstring>
+#include<map>
+#include<vector>
+#include<queue>
+using namespace std;
+int n,m,a[55][405],b[55],x[2][55],c[55],d[55],s,ans[2][1000000];
+bool e[55];
+void swa(int g1,int g2,int g3,int g4)
+{
+	int i;
+	for(i=1;i<=m-g2+1;i++)
+	{
+		s++;
+		ans[0][s]=g1;
+		ans[1][s]=n+1;
+	}
+	for(i=1;i<=m-g4+1;i++)
+	{
+		s++;
+		ans[0][s]=g3;
+		ans[1][s]=g1;
+	}
+	s++;
+	ans[0][s]=n+1;
+	ans[1][s]=g3;
+	s++;
+	ans[0][s]=g1;
+	ans[1][s]=n+1;
+	for(i=1;i<=m-g4;i++)
+	{
+		s++;
+		ans[0][s]=g1;
+		ans[1][s]=g3;
+	}
+	for(i=1;i<=m-g2+1;i++)
+	{
+		s++;
+		ans[0][s]=n+1;
+		ans[1][s]=g1;
+	}
+	return;
+}
+int main()
+{
+	freopen("ball.in","r",stdin);
+	freopen("ball.out","w",stdout);
+	int i,j,k,t;
+	cin>>n>>m;
+	t=n;
+	for(i=1;i<=n;i++)
+	{
+		a[i][0]=m;
+		for(j=1;j<=m;j++)
+		cin>>a[i][j];
+		x[0][i]=a[i][1];
+		for(j=1;j<=m;j++)
+		if(a[i][j]==a[i][1])x[1][i]++;
+		else break;
+	}
+	for(i=1;i<=n;i++)
+	{
+		if(d[x[0][i]]==0)
+		{
+			d[x[0][i]]=i;
+			c[i]=x[0][i];
+		}
+		else if(x[1][i]>x[1][d[x[0][i]]])
+		{
+			c[d[x[0][i]]]=0;
+			d[x[0][i]]=i;
+			c[i]=x[0][i];
+		}
+	}
+	i=1,j=1;
+	for(;;)
+	{
+		while(c[i]!=0&&i<=n)i++;
+		while(d[j]!=0&&j<=n)j++;
+		if(i>n)break;
+		c[i]=j;
+		d[j]=i;
+	}
+	int cir=0;
+	while(t!=0)
+	{
+		int u,v=0;
+		cir++;
+		if(cir<n)
+		{
+			int y[55];
+			for(i=1;i<=n;i++)
+			y[a[i][m]]++;
+			for(i=1;i<=n;i++)
+			{
+				if(y[i]>v&&e[i]==0)
+				{
+					u=i;
+					v=y[i];
+				}
+			}
+		}
+		else
+		{
+			while(e[cir%n+1]!=0)cir++;
+			u=cir%n+1;
+		}
+		i=1;
+		while(a[d[u]][i]==u&&i<=m)i++;
+		a[d[u]][0]=i-1;
+		a[n+1][0]=m-i+1;
+		for(j=m;j>=i;j--)
+		{
+			s++;
+			ans[0][s]=d[u];
+			ans[1][s]=n+1;
+			a[n+1][m-j+1]=a[d[u]][j];
+		}
+		for(j=1;j<=n;j++)
+		if(j!=d[u])
+		{
+			k=m;
+			while(a[j][k]==u&&k>=1)
+			{
+				k--;
+				s++;
+				ans[0][s]=j;
+				ans[1][s]=d[u];
+				a[d[u]][i]=u;
+				i++;
+			}
+			int fl=0,h;
+			for(int l=k;l>=k-m+a[n+1][0]-fl;l--)
+			if(a[j][l]==u)
+			{
+				fl++;
+				h=l;
+			}
+			for(;k>=h&&k>=1;k--)
+			{
+				if(a[j][k]==u)
+				{
+					s++;
+					ans[0][s]=j;
+					ans[1][s]=d[u];
+					a[d[u]][i]=u;
+					i++;
+				}
+				else
+				{
+					if(a[n+1][0]==m)break;
+					s++;
+					ans[0][s]=j;
+					ans[1][s]=n+1;
+					a[n+1][0]++;
+					a[n+1][a[n+1][0]]=a[j][k];
+				}
+			}
+			while(k<m)
+			{
+				if(a[n+1][a[n+1][0]]==u)
+				{
+					a[n+1][0]--;
+					s++;
+					ans[0][s]=n+1;
+					ans[1][s]=d[u];
+					a[d[u]][i]=u;
+					i++;
+				}
+				else
+				{
+					k++;
+					a[j][k]=a[n+1][a[n+1][0]];
+					a[n+1][0]--;
+					s++;
+					ans[0][s]=n+1;
+					ans[1][s]=j;
+				}
+			}
+		}
+		for(;i<=m;i++)
+		{
+			a[d[u]][i]=a[n+1][a[n+1][0]];
+			a[n+1][0]--;
+			s++;
+			ans[0][s]=n+1;
+			ans[1][s]=d[u];
+		}
+		a[d[u]][0]=m;
+		a[n+1][0]=0;
+		i=1;
+		while(a[d[u]][i]==u)i++;
+		for(j=1;j<=n;j++)
+		if(j!=d[u])
+		for(k=1;k<=m;k++)
+		if(a[j][k]==u)
+		{
+			if(k>=i)swa(j,k,d[u],i);
+			else swa(d[u],i,j,k);
+			swap(a[j][k],a[d[u]][i]);
+		}
+		int flag=1;
+		for(i=1;i<=m;i++)
+		if(a[d[u]][i]!=u)
+		{
+			flag=0;
+			break;
+		}
+		if(flag==1)
+		{
+			t--;
+			e[u]=1;
+		}
+		if(s>=100000)
+		{
+			for(i=1;i<=n;i++)
+			{
+				for(j=1;j<=m;j++)
+				cout<<a[i][j]<<' ';
+				cout<<endl;
+			}
+			cout<<s<<endl;
+			for(i=1;i<=1300000000;i++);
+		}
+	}
+	cout<<s<<endl;
+	for(i=1;i<=s;i++)
+	cout<<ans[0][i]<<' '<<ans[1][i]<<endl;
+	return 0;
+}
+

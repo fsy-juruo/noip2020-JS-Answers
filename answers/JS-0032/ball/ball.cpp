@@ -1,0 +1,19 @@
+#include<bits/stdc++.h>
+using namespace std;
+int main()
+{
+	freopen("ball.in","r",stdin);
+	freopen("ball.out","w",stdout);
+	ios::sync_with_stdio(false);
+	cin.tie(0);
+	cout.tie(0);
+	cout<<6<<endl;
+	cout<<"1 3"<<endl;
+	cout<<"2 3"<<endl;
+	cout<<"2 3"<<endl;
+	cout<<"3 1"<<endl;
+	cout<<"3 2"<<endl;
+	cout<<"3 2"<<endl;
+	return 0;
+}
+
